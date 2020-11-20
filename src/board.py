@@ -112,14 +112,6 @@ class Board:
                         result += counter*100
                         counter += 1
                     else:
-                        # if y-dir >= y-dir*(4-i+1):
-                        #     for j in range(y-dir*(4-i+1), y-dir):
-                        #         if not self.is_empty(x, j) and self.elements[x][j] == 2:
-                        #             return 0
-                        # else:
-                        #     for j in range(y-dir, y-dir*(4-i+1)):
-                        #         if not self.is_empty(x, j) and self.elements[x][j] == 2:
-                        #             return 0
                         eeval = evaluate_horizontal(x, y, -dir, (5-i), times-1)
                         if eeval == 0:
                             return 0

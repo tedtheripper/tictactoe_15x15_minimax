@@ -1,11 +1,9 @@
 from board import Board
-import random
+import random, re
 
 
 
 def minimax(b: Board, depth, maximizing, alpha, beta, x, y):
-    # score = b.evaluate_point(x, y)
-    # print(depth)
     if depth == 0:
         return b.evaluate_point(x, y)
     if b.get_empty_spaces() == 0:
@@ -16,11 +14,9 @@ def minimax(b: Board, depth, maximizing, alpha, beta, x, y):
             for n in b.gen_neighbours(u[0], u[1]):
                 if b.is_empty(n[0], n[1]):
                     b.set_value(n[0]+1, n[1]+1, 1)
-                    # b.print_board()
                     best = max(best, minimax(b, depth-1, not maximizing, alpha, beta, n[0], n[1]))
                     b.clear_value(n[0], n[1])
                     alpha = max(alpha, best)
-                    # print(f"A: {alpha} | B: {beta}")
                     if beta <= alpha:
                         return best
         return best
@@ -30,11 +26,9 @@ def minimax(b: Board, depth, maximizing, alpha, beta, x, y):
             for n in b.gen_neighbours(u[0], u[1]):
                 if b.is_empty(n[0], n[1]):
                     b.set_value(n[0]+1, n[1]+1, 2)
-                    # b.print_board()
                     best = min(best, minimax(b, depth-1, not maximizing, alpha, beta, x, y)) 
                     b.clear_value(n[0], n[1])
                     beta = min(beta, best)
-                    # print(f"A: {alpha} | B: {beta}")
                     if beta <= alpha:
                         return best
         return best
@@ -45,8 +39,8 @@ def findBestMove(b: Board):
     loses = set()
     max_points = set()
     high_local = -10000
-    local_x = 0
-    local_y = 0
+    local_x, local_y = 0, 0
+    # local_y = 0
     for u in b.used_positions:
         for n in b.gen_neighbours(u[0], u[1]):
             if n in visited:
@@ -59,8 +53,8 @@ def findBestMove(b: Board):
                 local = b.evaluate_point(n[0], n[1])
                 print(f"({n[0]+1}, {chr(n[1]+65)}) | {move_value} | {local}")
                 if move_value > best_value:
-                    res_x = n[0]
-                    res_y = n[1]
+                    res_x, res_y = n[0], n[1]
+                    # res_y = n[1]
                     best_value = move_value
                     max_points.clear()
                 if move_value == best_value:
@@ -82,8 +76,8 @@ def findBestMove(b: Board):
         for l in loses:
             if not b.if_lose_in_this_round(l[0], l[1]):
                 counter += 1
-                lose_x = l[0]
-                lose_y = l[1]
+                lose_x, lose_y = l[0], l[1]
+                # lose_y = l[1]
         for l in loses:
             if b.if_lose_in_this_round(l[0], l[1]):
                 return l[0], l[1]
@@ -103,8 +97,13 @@ def game():
     while not b.check_result()[0]:
         if player == 2:
             a = input("Insert the position in format X:Y\n")
-            inp = a.split(':')
-            moved = b.set_value(int(inp[1]), int(ord(inp[0]))-65+1, 2)
+            m = re.match(r'[A-O]:[1-15]', a)
+            if m:
+                inp = a.split(':')
+                moved = b.set_value(int(inp[1]), int(ord(inp[0]))-65+1, 2)
+            else:
+                print("Incorrect position")
+                continue
         else:
             ai_x, ai_y = findBestMove(b)
             moved = b.set_value(ai_x+1, ai_y+1, 1)
@@ -121,4 +120,5 @@ def game():
         print("X wins!")
     print("DONE")
 
-game()
+if __name__ == '__main__':
+    game()
