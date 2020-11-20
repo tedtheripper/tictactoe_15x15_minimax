@@ -12,7 +12,7 @@ class Board:
 
     def set_value(self, pos_x, pos_y, value):
         if(pos_x < 1 or pos_x > 15 or pos_y < 1 or pos_y > 15):
-            print("Wrong position(set)")
+            print("Incorrect position")
             return False
         if(self.elements[pos_x-1][pos_y-1] != 0):
             print(f"Move {pos_y}:{chr(65+pos_x-1)} forbidden")
@@ -23,7 +23,7 @@ class Board:
 
     def clear_value(self, pos_x, pos_y):
         if(pos_x < 0 or pos_x > 14 or pos_y < 0 or pos_y > 14):
-            print("Wrong position(clear)")
+            print("Incorrect position(clear)")
             return False
         self.elements[pos_x][pos_y] = 0
         self.used_positions.remove((pos_x, pos_y))
@@ -98,8 +98,8 @@ class Board:
         return final_neighbours
 
     def evaluate_point(self, x, y):
-        def evaluate_horizontal(x, y, dir, length, times):
-            result = 0
+        def evaluate_horizontal(x, y, dir, length, times, pre_points):
+            result = pre_points
             counter = 1
             if times == 0:
                 return 0
@@ -112,14 +112,14 @@ class Board:
                         result += counter*100
                         counter += 1
                     else:
-                        eeval = evaluate_horizontal(x, y, -dir, (5-i), times-1)
+                        eeval = evaluate_horizontal(x, y, -dir, (5-i), times-1, result)
                         if eeval == 0:
                             return 0
                         return eeval
                 result += 1
             return result 
-        def evaluate_vertical(x, y, dir, length, times):
-            result = 0
+        def evaluate_vertical(x, y, dir, length, times, pre_points):
+            result = pre_points
             counter = 1
             if times == 0:
                 return 0
@@ -132,18 +132,18 @@ class Board:
                         result += counter*100
                         counter += 1
                     else:
-                        eeval = evaluate_vertical(x, y, -dir, (5-i), times-1)
+                        eeval = evaluate_vertical(x, y, -dir, (5-i), times-1, result)
                         if eeval == 0:
                             return 0
                         return eeval
                 result += 1
             return result 
-        def evaluate_skew(x, y, dir, length, times):
-            result = 0
+        def evaluate_skew(x, y, dir, length, times, pre_points):
+            result = pre_points
             counter = 1
             if times == 0:
                 return 0
-            for i in range(1, 5):
+            for i in range(1, length):
                 if x+dir*i < 0 or x+dir*i > 14 or y+dir*i < 0 or y+dir*i > 14:
                     # return result
                     return 0
@@ -152,18 +152,18 @@ class Board:
                         result += counter*100
                         counter += 1
                     else:
-                        eeval = evaluate_skew(x, y, -dir, (5-i), times-1)
+                        eeval = evaluate_skew(x, y, -dir, (5-i), times-1, result)
                         if eeval == 0:
                             return 0
                         return eeval
                 result += 1
             return result 
-        def evaluate_anti_skew(x, y, dir, length, times):
-            result = 0
+        def evaluate_anti_skew(x, y, dir, length, times, pre_points):
+            result = pre_points
             counter = 1
             if times == 0:
                 return 0
-            for i in range(1, 5):
+            for i in range(1, length):
                 if x+dir*i < 0 or x+dir*i > 14 or y-dir*i < 0 or y-dir*i > 14:
                     # return result
                     return 0
@@ -172,7 +172,7 @@ class Board:
                         result += counter*100
                         counter += 1
                     else:
-                        eeval = evaluate_anti_skew(x, y, -dir, (5-i), times-1)
+                        eeval = evaluate_anti_skew(x, y, -dir, (5-i), times-1, result)
                         if eeval == 0:
                             return 0
                         return eeval
@@ -180,14 +180,14 @@ class Board:
             return result
         
         res = 0
-        res += evaluate_horizontal(x, y, 1, 5, 2)
-        res += evaluate_vertical(x, y, 1, 5, 2)
-        res += evaluate_skew(x, y, 1, 5, 2)
-        res += evaluate_anti_skew(x, y, 1, 5, 2)
-        res += evaluate_horizontal(x, y, -1, 5, 2)
-        res += evaluate_vertical(x, y, -1, 5, 2)
-        res += evaluate_skew(x, y, -1, 5, 2)
-        res += evaluate_anti_skew(x, y, -1, 5, 2)
+        res += evaluate_horizontal(x, y, 1, 5, 2, 0)
+        res += evaluate_vertical(x, y, 1, 5, 2, 0)
+        res += evaluate_skew(x, y, 1, 5, 2, 0)
+        res += evaluate_anti_skew(x, y, 1, 5, 2, 0)
+        res += evaluate_horizontal(x, y, -1, 5, 2, 0)
+        res += evaluate_vertical(x, y, -1, 5, 2, 0)
+        res += evaluate_skew(x, y, -1, 5, 2, 0)
+        res += evaluate_anti_skew(x, y, -1, 5, 2, 0)
         if self.check_result()[0]:
             if self.check_result()[1] == 1:
                 return res

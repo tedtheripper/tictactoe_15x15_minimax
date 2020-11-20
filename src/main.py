@@ -2,7 +2,6 @@ from board import Board
 import random, re
 
 
-
 def minimax(b: Board, depth, maximizing, alpha, beta, x, y):
     if depth == 0:
         return b.evaluate_point(x, y)
@@ -41,6 +40,7 @@ def findBestMove(b: Board):
     high_local = -10000
     local_x, local_y = 0, 0
     # local_y = 0
+    print("Thinking...")
     for u in b.used_positions:
         for n in b.gen_neighbours(u[0], u[1]):
             if n in visited:
@@ -68,7 +68,8 @@ def findBestMove(b: Board):
                 if move_value == -1000:
                     loses.add((n[0], n[1]))
     if best_value > 1000:
-        return res_x, res_y
+        return local_x, local_y
+        # return res_x, res_y
     if len(loses) == 1:
         return loses.pop()
     elif len(loses) > 1:
@@ -96,11 +97,13 @@ def game():
     b.print_board()
     while not b.check_result()[0]:
         if player == 2:
-            a = input("Insert the position in format X:Y\n")
-            m = re.match(r'[A-O]:[1-15]', a)
+            a = input("Insert the position in format X:Y (ex. G:9)\n")
+            m = re.match(r'[a-oA-O]:+', a)
             if m:
                 inp = a.split(':')
                 moved = b.set_value(int(inp[1]), int(ord(inp[0]))-65+1, 2)
+                if not moved:
+                    continue
             else:
                 print("Incorrect position")
                 continue
@@ -119,6 +122,10 @@ def game():
     elif player == 2:
         print("X wins!")
     print("DONE")
+    exit(0)
 
 if __name__ == '__main__':
-    game()
+    try:
+        game()
+    except Exception:
+        print("Something went wrong.")
